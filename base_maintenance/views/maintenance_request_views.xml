@@ -18,7 +18,7 @@
                 </div>
             </xpath>
             <field name="description" position="replace">
-                <notebook>
+                <notebook colspan="4">
                     <page name="description_page" string="Description">
                         <field name="description" />
                     </page>
