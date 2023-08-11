@@ -103,7 +103,7 @@ class MaintenanceEquipment(models.Model):
         )
         if furthest_maintenance_request:
             next_maintenance_date = (
-                furthest_maintenance_request.request_date
+                furthest_maintenance_request.get_base_maintenance_date()
                 + mtn_plan.get_relativedelta(
                     mtn_plan.interval, mtn_plan.interval_step or "year"
                 )
@@ -125,6 +125,11 @@ class MaintenanceEquipment(models.Model):
             next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
                 mtn_plan.interval, mtn_plan.interval_step or "year"
             )
+        if not requests.search([("maintenance_plan_id", "=", mtn_plan.id), ('stage_id.done', '=', False)]):
+            vals = self._prepare_request_from_plan(
+                mtn_plan, next_maintenance_date
+            )
+            requests |= self.env["maintenance.request"].create(vals)
         return requests
 
     @api.model
