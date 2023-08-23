@@ -153,7 +153,7 @@ class MaintenanceEquipment(models.Model):
     def _compute_next_maintenance(self):
         """Redefine the function to display next_action_date in kanban view"""
         for equipment in self:
-            next_plan_dates = equipment.maintenance_plan_ids.mapped(
+            next_plan_dates = equipment.maintenance_plan_ids.filtered('next_maintenance_date').mapped(
                 "next_maintenance_date"
             )
             next_unplanned_dates = (

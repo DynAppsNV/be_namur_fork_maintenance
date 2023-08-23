@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models
+from datetime import datetime
 
 
 class MaintenanceRequest(models.Model):
@@ -28,5 +29,8 @@ class MaintenanceRequest(models.Model):
         """
         self.ensure_one()
         base_date = self.env['ir.config_parameter'].sudo().get_param('maintenance.plan.base.date', 'done_date')
-        request_date = self.read([base_date])
-        return request_date[0].get(base_date) or fields.Date.today()
+        request_dict = self.read([base_date])
+        request_date = request_dict[0].get(base_date) or fields.Date.today()
+        if isinstance(request_date, datetime):
+            request_date = request_date.date()
+        return request_date
