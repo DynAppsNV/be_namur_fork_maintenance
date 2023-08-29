@@ -28,6 +28,11 @@
                                 <label for="maintenance_plan_base_date" />
                                 <div class="text-muted">
                                     Maintenance request date used to determine the next maintenance date when a maintenance plan is configured
+                                    <br/>
+                                    <em>
+                                        Note that 'Done date' configuration is not compatible with the configuration of planning horizons on
+                                        maintenance plans
+                                    </em>
                                 </div>
                                 <div class="content-group">
                                     <div class="mt16">
