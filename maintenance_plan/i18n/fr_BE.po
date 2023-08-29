@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-11 11:15+0000\n"
-"PO-Revision-Date: 2023-08-11 11:15+0000\n"
+"POT-Creation-Date: 2023-08-29 14:18+0000\n"
+"PO-Revision-Date: 2023-08-29 14:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -124,7 +124,7 @@ msgstr "Nom affiché"
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__skip_notify_follower_on_requests
 msgid "Do not notify to follower when creating requests?"
-msgstr ""
+msgstr "Ne pas notifier les abonnés à la création d'une demande"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_request__done_date
@@ -145,7 +145,7 @@ msgstr "Équipement"
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Abonnés"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__message_partner_ids
@@ -203,7 +203,7 @@ msgstr ""
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
 msgid "If not clicked, the scheduled action will do it for you."
-msgstr ""
+msgstr "Sinon l'action planifiée le fera pour vous"
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_search
@@ -229,7 +229,7 @@ msgstr ""
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
 msgid "Kind"
-msgstr ""
+msgstr "Type"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_kind____last_update
@@ -252,7 +252,7 @@ msgstr "Dernière mise à jour le"
 #. module: maintenance_plan
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__planning_step
 msgid "Let the event automatically repeat at that interval"
-msgstr ""
+msgstr "Laisser l'événement se répéter automatiquement à cet intervalle"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__interval_step
@@ -262,12 +262,6 @@ msgstr "L'événement se répète automatiquement à cette étape"
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
-
-#. module: maintenance_plan
-#: code:addons/maintenance_plan/models/maintenance_plan.py:0
-#, python-format
-msgid "Maintenance Equipment must belong to the equipment's company"
 msgstr ""
 
 #. module: maintenance_plan
@@ -281,6 +275,12 @@ msgstr ""
 #: model:ir.model,name:maintenance_plan.model_maintenance_equipment
 msgid "Maintenance Equipment"
 msgstr "Equipement de maintenance"
+
+#. module: maintenance_plan
+#: code:addons/maintenance_plan/models/maintenance_plan.py:0
+#, python-format
+msgid "Maintenance Equipment must belong to the equipment's company"
+msgstr ""
 
 #. module: maintenance_plan
 #: model:ir.model,name:maintenance_plan.model_maintenance_kind
@@ -363,7 +363,9 @@ msgstr "Planification de maintenance"
 msgid ""
 "Maintenance planning horizon. Only the maintenance requests inside the "
 "horizon will be created."
-msgstr "Horizon de maintenance. Seules les demandes de maintenance à l'intérieur de cet horizon seront créées."
+msgstr ""
+"Horizon de maintenance. Seules les demandes de maintenance à l'intérieur de "
+"cet horizon seront créées."
 
 #. module: maintenance_plan
 #: model:ir.actions.act_window,name:maintenance_plan.maintenance_plan_action
@@ -374,9 +376,18 @@ msgstr "Planifications de maintenance"
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.res_config_settings_maintenance_form
 msgid ""
-"Maintenance request date used to determine the next maintenance date when a "
-"maintenance plan is configured"
-msgstr "Date de la demande de maintenance qui sera utilisée pour déterminer la date de la prochaine maintenance sur les planifications de maintenance"
+"Maintenance request date used to determine the next maintenance date when a maintenance plan is configured\n"
+"                                    <br/>\n"
+"                                    <em>\n"
+"                                        Note that 'Done date' configuration is not compatible with the configuration of planning horizons on\n"
+"                                        maintenance plans\n"
+"                                    </em>"
+msgstr ""
+"Date de la demande de maintenance utilisée pour déterminer la date de maintenance suivante quand une planification de maintenance est configurée \n"
+"                                    <br/>\n"
+"                                    <em>\n"
+"La configuration 'Date de fin' n'est pas compatible avec la configuration des horizons dans les planifications de maintenance\n"
+"                                    </em>"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__maintenance_ids
@@ -474,27 +485,27 @@ msgstr ""
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
 msgid "P. Horizon period"
-msgstr ""
+msgstr "Horizon période"
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
 msgid "P. Horizon step"
-msgstr ""
+msgstr "Horizon intervalle"
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
 msgid "Planning Horizon"
-msgstr ""
+msgstr "Horizon de planification"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__maintenance_plan_horizon
 msgid "Planning Horizon period"
-msgstr ""
+msgstr "Période de l'horizon"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__planning_step
 msgid "Planning Horizon step"
-msgstr ""
+msgstr "Intervalle de l'horizon"
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
@@ -505,18 +516,18 @@ msgstr ""
 #: code:addons/maintenance_plan/models/maintenance_equipment.py:0
 #, python-format
 msgid "Preventive Maintenance (%(kind)s) - %(description)s"
-msgstr ""
+msgstr "Maintenance préventive (%(kind)s) - %(description)s"
 
 #. module: maintenance_plan
 #: code:addons/maintenance_plan/tests/test_maintenance_plan.py:0
 #, python-format
 msgid "Preventive Maintenance (%(kind)s) - %(plan)s"
-msgstr ""
+msgstr "Maintenance préventive (%(kind)s) - %(plan)s"
 
 #. module: maintenance_plan
 #: model:ir.actions.server,name:maintenance_plan.compute_next_maintenance
 msgid "Recompute next maintenance date"
-msgstr ""
+msgstr "Recalculer la date de prochaine maintenance"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__interval_step
@@ -560,7 +571,7 @@ msgstr ""
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
 msgid "Start Date"
-msgstr ""
+msgstr "Date de début"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__start_maintenance_date
@@ -579,7 +590,7 @@ msgstr ""
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.hr_equipment_view_form
 msgid "Team"
-msgstr ""
+msgstr "Équipe"
 
 #. module: maintenance_plan
 #: code:addons/maintenance_plan/models/maintenance_plan.py:0
@@ -589,6 +600,9 @@ msgid ""
 "request which is not done yet. You should either set the request as done, "
 "remove its maintenance kind or delete it first."
 msgstr ""
+"La planification de maintenance %(kind)s de l'équipement %(eqpmnt)s a généré une "
+"demande qui n'est pas encore terminée. Vous devez soit marquer cette demande comme faite, "
+"soit retirer son type de maintenance, soit la supprimer."
 
 #. module: maintenance_plan
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__activity_exception_decoration
@@ -664,6 +678,8 @@ msgid ""
 "You cannot define multiple times the same maintenance kind on an equipment "
 "maintenance plan."
 msgstr ""
+"Vous ne pouvez aps indiquer plusieurs fois le même type de maintenance sur la planification de maintenance "
+"d'un même équipement."
 
 #. module: maintenance_plan
 #: code:addons/maintenance_plan/hooks.py:0
