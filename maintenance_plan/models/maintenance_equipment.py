@@ -119,7 +119,9 @@ class MaintenanceEquipment(models.Model):
         requests = request_model
         # Create maintenance request until we reach planning horizon
         while next_maintenance_date <= horizon_date:
-            if next_maintenance_date >= fields.Date.today():
+            if next_maintenance_date >= fields.Date.today() and not self.maintenance_ids.filtered(
+                lambda m: m.maintenance_plan_id.id == mtn_plan.id and m.request_date == next_maintenance_date
+                          and not m.stage_id.done):
                 vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
                 requests |= request_model.create(vals)
             next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
