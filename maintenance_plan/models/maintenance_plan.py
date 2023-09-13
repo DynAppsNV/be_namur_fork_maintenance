@@ -37,7 +37,7 @@ class MaintenancePlan(models.Model):
     )
     start_maintenance_date = fields.Date(
         default=fields.Date.context_today,
-        help="Date from which the maintenance will we active",
+        help="Date from which the maintenance will be active",
     )
     next_maintenance_date = fields.Date(compute="_compute_next_maintenance", store=True)
     maintenance_plan_horizon = fields.Integer(
