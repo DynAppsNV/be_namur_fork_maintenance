@@ -122,13 +122,14 @@ class MaintenanceEquipment(models.Model):
         )
         requests = request_model
         # Create maintenance request until we reach planning horizon
-        while next_maintenance_date <= horizon_date:
-            if next_maintenance_date >= fields.Date.today():
-                vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
-                requests |= request_model.create(vals)
-            next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
-                mtn_plan.interval, mtn_plan.interval_step or "year"
-            )
+        if next_maintenance_date:
+            while next_maintenance_date <= horizon_date:
+                if next_maintenance_date >= fields.Date.today():
+                    vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
+                    requests |= request_model.create(vals)
+                next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
+                    mtn_plan.interval, mtn_plan.interval_step or "year"
+                )
         return requests
 
     @api.model
@@ -152,7 +153,7 @@ class MaintenanceEquipment(models.Model):
     def _compute_next_maintenance(self):
         """Redefine the function to display next_action_date in kanban view"""
         for equipment in self:
-            next_plan_dates = equipment.maintenance_plan_ids.mapped(
+            next_plan_dates = equipment.maintenance_plan_ids.filtered("next_maintenance_date").mapped(
                 "next_maintenance_date"
             )
             next_unplanned_dates = (

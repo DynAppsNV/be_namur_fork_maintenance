@@ -155,8 +155,9 @@ class MaintenancePlan(models.Model):
                     )
                 else:
                     next_date = plan.start_maintenance_date
-                    while next_date < fields.Date.today():
-                        next_date = next_date + interval_timedelta
+                    if next_date:
+                        while next_date < fields.Date.today():
+                            next_date = next_date + interval_timedelta
                     plan.next_maintenance_date = next_date
 
     @api.constrains("company_id", "equipment_id")
