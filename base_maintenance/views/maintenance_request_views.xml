@@ -17,12 +17,14 @@
                     <!--Empty, to be inherited by other modules.-->
                 </div>
             </xpath>
-            <xpath expr="//field[@name='description']" position="replace">
+            <xpath expr="//sheet" position="inside">
                 <notebook>
-                    <page name="description_page" string="Description">
-                        <field name="description" />
-                    </page>
+                    <page name="description_page" string="Description"/>
                 </notebook>
+            </xpath>
+
+            <xpath expr="//page[@name='description_page']" position="inside">
+                <xpath expr="//field[@name='description']" position="move"/>
             </xpath>
         </field>
     </record>
