@@ -21,7 +21,7 @@
                         string="Generate requests for current threshold"
                         help="If not clicked, the scheduled action will do it for you."
                         type="object"
-                        attrs="{'invisible' : ['|', ('id', '=', False),('interval', '=', 0)]}"
+                        invisible="'|', ('id', '=', False), ('interval', '=', 0)"
                     />
                 </header>
                 <sheet>
@@ -29,9 +29,9 @@
                         name="web_ribbon"
                         title="Archived"
                         bg_color="bg-danger"
-                        attrs="{'invisible': [('active', '=', True)]}"
+                        invisible="active"
                     />
-                    <field name="active" attrs="{'invisible': 1}" />
+                    <field name="active" invisible="1" />
                     <div class="oe_button_box" name="button_box">
                         <button
                             name="%(hr_equipment_request_action_from_plan)d"
@@ -52,7 +52,7 @@
                             <field
                                 name="name"
                                 placeholder="e.g. Calibration"
-                                attrs="{'required': [('equipment_id', '=', False)]}"
+                                required="not equipment_id"
                             />
                         </h1>
                     </div>
@@ -65,7 +65,7 @@
                             <field name="maintenance_kind_id" />
                             <field
                                 name="maintenance_team_id"
-                                attrs="{'required': [('equipment_id', '=', False)]}"
+                                required="not equipment_id"
                             />
                         </group>
                         <group>
@@ -133,7 +133,7 @@
                 <field name="next_maintenance_date" />
                 <field name="maintenance_plan_horizon" />
                 <field name="planning_step" />
-                <field name="active" attrs="{'invisible': True}" />
+                <field name="active" invisible="1" />
                 <field name="company_id" groups="base.group_multi_company" />
             </tree>
         </field>
