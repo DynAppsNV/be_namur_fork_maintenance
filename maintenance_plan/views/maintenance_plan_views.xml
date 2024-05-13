@@ -94,7 +94,7 @@
                             />
                             <div class="o_row">
                                 <field name="maintenance_plan_horizon" />
-                                <field name="planning_step" />
+                                <field name="planning_step" required="1"/>
                             </div>
                         </group>
                     </group>

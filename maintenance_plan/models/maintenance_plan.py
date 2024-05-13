@@ -44,12 +44,11 @@ class MaintenancePlan(models.Model):
     )
     start_maintenance_date = fields.Date(
         default=fields.Date.context_today,
-        help="Date from which the maintenance will we active",
+        help="Date from which the maintenance will be active",
     )
     next_maintenance_date = fields.Date(compute="_compute_next_maintenance", store=True)
     maintenance_plan_horizon = fields.Integer(
         string="Planning Horizon period",
-        default=1,
         help="Maintenance planning horizon. Only the maintenance requests "
         "inside the horizon will be created.",
     )
@@ -139,7 +138,7 @@ class MaintenancePlan(models.Model):
             )
 
             if next_maintenance_todo:
-                plan.next_maintenance_date = next_maintenance_todo.request_date
+                plan.next_maintenance_date = next_maintenance_todo.get_base_maintenance_date()
             else:
                 last_maintenance_done = self.env["maintenance.request"].search(
                     [
@@ -151,7 +150,7 @@ class MaintenancePlan(models.Model):
                 )
                 if last_maintenance_done:
                     plan.next_maintenance_date = (
-                        last_maintenance_done.request_date + interval_timedelta
+                        last_maintenance_done.get_base_maintenance_date() + interval_timedelta
                     )
                 else:
                     next_date = plan.start_maintenance_date
@@ -168,7 +167,7 @@ class MaintenancePlan(models.Model):
                 and rec.company_id != rec.equipment_id.company_id
             ):
                 raise ValidationError(
-                    _("Maintenace Equipment must belong to the equipment's company")
+                    _("Maintenance Equipment must belong to the equipment's company")
                 )
 
     def unlink(self):

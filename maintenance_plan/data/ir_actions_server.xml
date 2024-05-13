@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="compute_next_maintenance" model="ir.actions.server">
+        <field name="name">Recompute next maintenance date</field>
+        <field name="model_id" ref="maintenance_plan.model_maintenance_plan"/>
+        <field name="binding_model_id" ref="maintenance_plan.model_maintenance_plan"/>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="code">
+            records._compute_next_maintenance()
+        </field>
+    </record>
+
+</odoo>
