@@ -4,4 +4,4 @@
 * Adrià Gil Sorribes <adria.gil@forgeflow.com>
 * Jordi Ballester Alomar <jordi.ballester@forgeflow.com>
 * Lois Rilo <lois.rilo@forgeflow.com>
-* Yvan Dotet <yvan.dotet@logicasoft.eu>
+* Yvan Dotet <yvan.dotet@dynapps.be>

@@ -48,5 +48,6 @@ def post_init_hook(cr, registry):
                     "maintenance_kind_id": maintenance_kind.id,
                     "duration": equipment.maintenance_duration,
                     "interval": equipment.period,
+                    "company_id": equipment.company_id.id
                 }
             )
