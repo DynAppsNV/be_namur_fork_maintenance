@@ -4,7 +4,7 @@
 from odoo import fields, models
 
 
-class MiantenancePlannedactivity(models.Model):
+class MaintenancePlannedactivity(models.Model):
     _name = "maintenance.planned.activity"
     _description = "Maintenance Planned Activity"
 

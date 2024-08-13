@@ -6,7 +6,7 @@
         <field name="model">maintenance.plan</field>
         <field name="inherit_id" ref="maintenance_plan.maintenance_plan_view_form" />
         <field name="arch" type="xml">
-            <xpath expr="//form/sheet/notebook/page[1]" position="after">
+            <xpath expr="//notebook" position="inside">
                 <page string="Scheduled Activities">
                     <field name="planned_activity_ids" nolabel="1" />
                 </page>

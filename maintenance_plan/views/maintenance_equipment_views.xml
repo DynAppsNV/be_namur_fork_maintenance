@@ -65,21 +65,6 @@
             <field name="maintenance_type" position="after">
                 <field name="maintenance_kind_id" />
             </field>
-            <!-- TODO: Use position="move" instead -->
-            <xpath expr="//notebook/page[@name='description_page']" position="before">
-                    <page string="Instructions">
-                        <field
-                        name="note"
-                        placeholder="Describe the maintenance to do..."
-                    />
-                    </page>
-            </xpath>
-            <xpath
-                expr="//notebook/page[@name='description_page']"
-                position="attributes"
-            >
-                    <attribute name="string">Notes</attribute>
-            </xpath>
         </field>
     </record>
     <record id="maintenance.hr_equipment_action" model="ir.actions.act_window">
