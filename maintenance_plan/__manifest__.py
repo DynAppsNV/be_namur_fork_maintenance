@@ -3,7 +3,7 @@
 {
     "name": "Maintenance Plan",
     "summary": "Extends preventive maintenance planning",
-    "version": "17.0.0.4",
+    "version": "18.0.0.0",
     "author": "Camptocamp SA, ForgeFlow, Odoo Community Association (Forked by Dynapps)",
     "license": "AGPL-3",
     "category": "Maintenance",
@@ -13,17 +13,16 @@
     "data": [
         "security/ir.model.access.csv",
         "security/maintenance_security.xml",
-
-        "data/ir_actions_server.xml",
-        "data/maintenance_equipment.xml",
-
-        "views/res_config_settings.xml",
+        "data/ir_cron.xml",
         "views/maintenance_kind_views.xml",
         "views/maintenance_plan_views.xml",
         "views/maintenance_equipment_views.xml",
         "views/report_maintenance_request.xml",
+
+        "data/ir_actions_server.xml",
+        "views/res_config_settings.xml",
     ],
     "external_dependencies": {"python": ["python-dateutil"]},
-    "demo": ["data/demo_maintenance_plan.xml"],
+    "demo": ["demo/demo_maintenance_plan.xml"],
     "installable": True,
 }
