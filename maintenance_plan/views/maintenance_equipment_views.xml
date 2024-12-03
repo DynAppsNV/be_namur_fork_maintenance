@@ -28,7 +28,7 @@
                    name="maintenance_plan_ids"
                    nolabel="1"
                    colspan="4"
-                   context="{'default_equipment_id': id, 'hide_equipment_id': 1}"
+                   context="{'hide_equipment_id': 1}"
                >
                    <list>
                        <field name="maintenance_kind_id" string="Kind" />
