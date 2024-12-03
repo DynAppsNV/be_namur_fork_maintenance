@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-13 13:10+0000\n"
-"PO-Revision-Date: 2024-05-13 13:10+0000\n"
+"POT-Creation-Date: 2024-12-10 08:03+0000\n"
+"PO-Revision-Date: 2024-12-10 08:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -197,7 +197,7 @@ msgstr "Si coché, de nouveaux messages demandent votre attention."
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_error
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr "i actif, certains messages ont une erreur de livraison."
+msgstr "Si actif, certains messages ont une erreur de livraison."
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
@@ -297,7 +297,7 @@ msgstr "Planification de maintenance"
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_res_config_settings__maintenance_plan_base_date
 msgid "Maintenance Plan Base Date"
-msgstr ""
+msgstr "Date de base planification de maintenances"
 
 #. module: maintenance_plan
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_equipment__maintenance_plan_count
@@ -379,14 +379,16 @@ msgid ""
 "Maintenance request date used to determine the next maintenance date when a maintenance plan is configured\n"
 "                                    <br/>\n"
 "                                    <em>\n"
-"                                        Note that 'Done date' configuration is not compatible with the configuration of planning horizons on\n"
-"                                        maintenance plans\n"
+"                                        Note that this configuration is not compatible with the configuration of planning horizons on\n"
+"                                        maintenance plans. For maintenance plans with planning horizon set, the date will automatically\n"
+"                                        be the requested date.\n"
 "                                    </em>"
 msgstr ""
 "Date de la demande de maintenance utilisée pour déterminer la date de maintenance suivante quand une planification de maintenance est configurée \n"
 "                                    <br/>\n"
 "                                    <em>\n"
-"La configuration 'Date de fin' n'est pas compatible avec la configuration des horizons dans les planifications de maintenance\n"
+"Cette configuration n'est pas compatible avec la configuration des horizons dans les planifications de maintenance\n"
+"La date utilisée pour calculer la maintenance suivante des planifications de maintenance avec un horizon sera automatiquement la date prévue"
 "                                    </em>"
 
 #. module: maintenance_plan

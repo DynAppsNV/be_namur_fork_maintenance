@@ -27,16 +27,17 @@ class MaintenanceRequest(models.Model):
                 vals["done_date"] = fields.Datetime.now()
         return super(MaintenanceRequest, self).write(vals)
 
-    def get_base_maintenance_date(self):
+    def get_base_maintenance_date(self, base_date=False):
         """
         Returns the date used to compute the next maintenance planned
         """
         self.ensure_one()
-        base_date = self.env['ir.config_parameter'].sudo().get_param('maintenance.plan.base.date', 'done_date')
-        request_dict = self.read([base_date])
+        if not base_date:
+            base_date = self.env['ir.config_parameter'].sudo().get_param('maintenance.plan.base.date', 'done_date')
+        request_dict = self.read([base_date, 'request_date'])
         # If base date is not set yet (e.g. when creating requests from horizon planning), we must fall back to
         # standard behavior and use request date as base date
-        request_date = request_dict[0].get(base_date) or self.request_date
+        request_date = request_dict[0].get(base_date) or request_dict[0].get('request_date')
         if request_date and isinstance(request_date, datetime):
             request_date = request_date.date()
         return request_date
