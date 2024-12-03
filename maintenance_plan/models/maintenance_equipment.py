@@ -90,6 +90,11 @@ class MaintenanceEquipment(models.Model):
         horizon_date = fields.Date.today() + mtn_plan.get_relativedelta(
             mtn_plan.maintenance_plan_horizon, mtn_plan.planning_step or "year"
         )
+        if mtn_plan.maintenance_plan_horizon > 0:
+            base_date = 'request_date'
+        else:
+            base_date = self.env['ir.config_parameter'].sudo().get_param('maintenance.plan.base.date',
+                                                                         'done_date')
         # We check maintenance request already created and create until
         # planning horizon is met
         start_maintenance_date_plan = mtn_plan.start_maintenance_date
@@ -103,7 +108,7 @@ class MaintenanceEquipment(models.Model):
         )
         if furthest_maintenance_request:
             next_maintenance_date = (
-                furthest_maintenance_request.get_base_maintenance_date()
+                furthest_maintenance_request.get_base_maintenance_date(base_date)
                 + mtn_plan.get_relativedelta(
                     mtn_plan.interval, mtn_plan.interval_step or "year"
                 )
