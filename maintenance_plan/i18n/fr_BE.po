@@ -198,7 +198,7 @@ msgstr "Si coché, de nouveaux messages demandent votre attention."
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_error
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr Si actif, certains messages ont une erreur de livraison."
+msgstr "Si actif, certains messages ont une erreur de livraison."
 
 #. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
@@ -380,13 +380,15 @@ msgid ""
 "                                    <br/>\n"
 "                                    <em>\n"
 "                                        Note that 'Done date' configuration is not compatible with the configuration of planning horizons on\n"
-"                                        maintenance plans\n"
+"                                        maintenance plans. For maintenance plans with planning horizon set, the date will automatically\n"
+"                                        be the requested date.\n"
 "                                    </em>"
 msgstr ""
 "Date de la demande de maintenance utilisée pour déterminer la date de maintenance suivante quand une planification de maintenance est configurée \n"
 "                                    <br/>\n"
 "                                    <em>\n"
 "La configuration 'Date de fin' n'est pas compatible avec la configuration des horizons dans les planifications de maintenance\n"
+"La date utilisée pour calculer la maintenance suivante des planifications de maintenance avec un horizon sera automatiquement la date prévue"
 "                                    </em>"
 
 #. module: maintenance_plan
