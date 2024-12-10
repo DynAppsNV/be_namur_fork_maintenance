@@ -30,8 +30,9 @@
                                     Maintenance request date used to determine the next maintenance date when a maintenance plan is configured
                                     <br/>
                                     <em>
-                                        Note that 'Done date' configuration is not compatible with the configuration of planning horizons on
-                                        maintenance plans
+                                        Note that this configuration is not compatible with the configuration of planning horizons on
+                                        maintenance plans. For maintenance plans with planning horizon set, the date will automatically
+                                        be the requested date.
                                     </em>
                                 </div>
                                 <div class="content-group">
