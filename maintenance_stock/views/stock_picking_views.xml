@@ -41,7 +41,7 @@
                 <page
                     string="Maintenance Info"
                     name="maintenance"
-                    attrs="{'invisible': [('maintenance_request_id', '=', False)]}"
+                    invisible="not maintenance_request_id"
                 >
                     <group>
                         <group>

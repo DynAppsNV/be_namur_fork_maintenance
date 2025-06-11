@@ -40,14 +40,15 @@ from odoo import models, fields, api, exceptions, _
 class PickingType(models.Model):
     _inherit = "stock.picking.type"
 
-    @api.model
-    def create(self, vals):
-        if 'warehouse_id' in vals and not 'company_id' in vals:
-            company_id = self.env['stock.warehouse'].browse(vals['warehouse_id']).company_id.id
-            vals.update({
-                'company_id': company_id,
-            })
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if 'warehouse_id' in vals and not 'company_id' in vals:
+                company_id = self.env['stock.warehouse'].browse(vals['warehouse_id']).company_id.id
+                vals.update({
+                    'company_id': company_id,
+                })
 
-        picking_type = super(PickingType, self).create(vals)
+        picking_type = super().create(vals_list)
         return picking_type
 
