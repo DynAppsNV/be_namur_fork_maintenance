@@ -4,7 +4,6 @@
     <record id="hr_equipment_view_search" model="ir.ui.view">
         <field name="model">maintenance.equipment</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_view_search" />
-        <field name="groups_id" eval="[(4, ref('stock.group_stock_user'))]" />
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='inactive']" position="after">
                 <separator />
@@ -20,10 +19,9 @@
     <record id="hr_equipment_view_tree" model="ir.ui.view">
         <field name="model">maintenance.equipment</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_view_tree" />
-        <field name="groups_id" eval="[(4, ref('stock.group_stock_user'))]" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='category_id']" position="after">
-                <field name="allow_consumptions" />
+                <field name="allow_consumptions"/>
             </xpath>
         </field>
     </record>
@@ -31,7 +29,6 @@
     <record id="hr_equipment_view_form" model="ir.ui.view">
         <field name="model">maintenance.equipment</field>
         <field name="inherit_id" ref="maintenance.hr_equipment_view_form" />
-        <field name="groups_id" eval="[(4, ref('stock.group_stock_user'))]" />
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button
@@ -39,7 +36,7 @@
                     type="object"
                     name="action_view_stock_picking_ids"
                     icon="fa-ticket"
-                    attrs="{'invisible': [('allow_consumptions', '=', False)]}"
+                    invisible="not allow_consumptions"
                 >
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_text">Picking list</span>
@@ -50,8 +47,7 @@
                     type="object"
                     name="action_view_stock_move_ids"
                     icon="fa-arrows-v"
-                    attrs="{'invisible': [('allow_consumptions', '=', False)]}"
-                    groups="base.group_no_one"
+                    invisible="not allow_consumptions"
                 >
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_text">Stock Moves</span>
@@ -62,7 +58,8 @@
                     type="object"
                     name="action_view_stock_move_line_ids"
                     icon="fa-arrows-v"
-                    attrs="{'invisible': [('allow_consumptions', '=', False)]}"
+                    invisible="not allow_consumptions"
+                    groups="stock.group_stock_user"
                 >
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_text">Product Moves</span>
@@ -70,11 +67,11 @@
                 </button>
             </xpath>
             <xpath expr="//field[@name='location']" position="after">
-                <field name="allow_consumptions" />
+                <field name="allow_consumptions"/>
                 <field
                     name="default_consumption_warehouse_id"
-                    attrs="{'invisible': [('allow_consumptions', '=', False)],
-                                    'required': [('allow_consumptions', '=', True)]}"
+                    invisible="not allow_consumptions"
+                    required="allow_consumptions"
                 />
             </xpath>
         </field>
