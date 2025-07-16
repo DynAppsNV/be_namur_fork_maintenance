@@ -52,17 +52,15 @@ class StockWarehouse(models.Model):
         data = super()._get_picking_type_update_values()
         return {**data, "cons_type_id": {}}
 
-    def _get_sequence_values(self):
-        data = super()._get_sequence_values()
-        return {
-            **data,
-            "cons_type_id": {
+    def _get_sequence_values(self, name=False, code=False):
+        data = super()._get_sequence_values(name, code)
+        data['cons_type_id'] = {
                 "name": self.name + " " + _("Sequence consumption"),
                 "prefix": self.code + "/CONS/",
                 "padding": 5,
                 "company_id": self.company_id.id,
-            },
-        }
+            }
+        return data
 
     def _get_locations_values(self, vals, code=False):
         sub_locations = super()._get_locations_values(vals, code)

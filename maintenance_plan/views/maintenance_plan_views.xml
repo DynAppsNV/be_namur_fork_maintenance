@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version='1.0' encoding='utf-8'?>
 <odoo>
     <record id="hr_equipment_request_action_from_plan" model="ir.actions.act_window">
         <field name="name">Maintenance Requests</field>
@@ -6,9 +6,9 @@
         <field name="binding_model_id" ref="model_maintenance_plan" />
         <field name="view_mode">kanban,list,form,pivot,graph,calendar</field>
         <field name="context">{
-            'default_maintenance_plan_id': id,
+            'default_maintenance_plan_id': active_id,
         }</field>
-        <field name="domain">[('maintenance_plan_id', '=', id)]</field>
+        <field name="domain">[('maintenance_plan_id', '=', active_id)]</field>
     </record>
     <record id="maintenance_plan_view_form" model="ir.ui.view">
         <field name="name">maintenance.plan.form</field>
@@ -16,74 +16,33 @@
         <field name="arch" type="xml">
             <form string="Maintenance Plan">
                 <header>
-                    <button
-                        name="button_manual_request_generation"
-                        string="Generate requests for current threshold"
-                        help="If not clicked, the scheduled action will do it for you."
-                        type="object"
-                        invisible="not id or interval == 0"
-                    />
+                    <button name="button_manual_request_generation" string="Generate requests for current threshold" help="If not clicked, the scheduled action will do it for you." type="object" invisible="(id == False or interval == 0)" />
                 </header>
                 <sheet>
-                    <widget
-                        name="web_ribbon"
-                        title="Archived"
-                        bg_color="bg-danger"
-                        invisible="active"
-                    />
-                    <field name="active" invisible="True" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active == True" />
+                    <field name="active" invisible="1" />
                     <div class="oe_button_box" name="button_box">
-                        <button
-                            name="%(hr_equipment_request_action_from_plan)d"
-                            type="action"
-                            class="oe_stat_button"
-                            icon="fa-ticket"
-                        >
-                            <field
-                                string="Maintenance"
-                                name="maintenance_count"
-                                widget="statinfo"
-                            />
+                        <button name="%(hr_equipment_request_action_from_plan)d" type="action" class="oe_stat_button" icon="fa-ticket">
+                            <field string="Maintenance" name="maintenance_count" widget="statinfo" />
                         </button>
                     </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" />
                         <h1>
-                            <field
-                                name="name"
-                                placeholder="e.g. Calibration"
-                                required="not equipment_id"
-                            />
+                            <field name="name" placeholder="e.g. Calibration" required="equipment_id == False" />
                         </h1>
                     </div>
                     <group>
                         <group>
-                            <field
-                                name="equipment_id"
-                                invisible="context.get('hide_equipment_id', 0)"
-                            />
+                            <field name="equipment_id" invisible="context.get('hide_equipment_id', 0)" />
                             <field name="maintenance_kind_id" />
-                            <field
-                                name="maintenance_team_id"
-                                required="not equipment_id"
-                            />
-                            <field
-                                name="generate_with_domain"
-                                invisible="equipment_id"
-                            />
-                            <field
-                                name="generate_domain"
-                                widget="domain"
-                                options="{'model': 'maintenance.equipment', 'in_dialog': True}"
-                                invisible="equipment_id or not generate_with_domain"
-                            />
+                            <field name="maintenance_team_id" required="equipment_id == False" />
+                            <field name="generate_with_domain" invisible="equipment_id != False" />
+                            <field name="generate_domain" widget="domain" options="{'model': 'maintenance.equipment', 'in_dialog': True}" invisible="(equipment_id != False or generate_with_domain == False)" />
                         </group>
                         <group>
                             <field name="skip_notify_follower_on_requests" />
-                            <field
-                                name="company_id"
-                                groups="base.group_multi_company"
-                            />
+                            <field name="company_id" groups="base.group_multi_company" />
                         </group>
                     </group>
                     <group>
@@ -98,33 +57,27 @@
                                 <field name="interval" />
                                 <field name="interval_step" />
                             </div>
-                            <label
-                                for="maintenance_plan_horizon"
-                                string="Planning Horizon"
-                            />
+                            <label for="maintenance_plan_horizon" string="Planning Horizon" />
                             <div class="o_row">
                                 <field name="maintenance_plan_horizon" />
-                                <field name="planning_step" required="True"/>
+                                <field name="planning_step" />
                             </div>
                         </group>
                     </group>
                     <notebook>
                         <page string="Instructions">
-                            <field
-                                name="note"
-                                placeholder="Describe the maintenance to do..."
-                            />
+                            <field name="note" placeholder="Describe the maintenance to do..." />
                         </page>
                     </notebook>
                 </sheet>
                 <div class="o_attachment_preview" />
-                <!-- Chatter -->
+
                 <chatter/>
             </form>
         </field>
     </record>
     <record id="maintenance_plan_view_tree" model="ir.ui.view">
-        <field name="name">maintenance.plan.list</field>
+        <field name="name">maintenance.plan.tree</field>
         <field name="model">maintenance.plan</field>
         <field name="arch" type="xml">
             <list decoration-muted="active == False">
@@ -139,7 +92,7 @@
                 <field name="next_maintenance_date" />
                 <field name="maintenance_plan_horizon" />
                 <field name="planning_step" />
-                <field name="active" column_invisible="True" />
+                <field name="active" invisible="True" />
                 <field name="company_id" groups="base.group_multi_company" />
             </list>
         </field>
@@ -156,16 +109,8 @@
                 <field name="company_id" groups="base.group_multi_company" />
                 <field name="start_maintenance_date" />
                 <filter string="Active" name="active" domain="[('active', '=',True)]" />
-                <filter
-                    string="Inactive"
-                    name="archived"
-                    domain="[('active', '=',False)]"
-                />
-                <filter
-                    string="Under Maintenance"
-                    name="under_maintenance"
-                    domain="[('maintenance_open_count', '&gt;', 0)]"
-                />
+                <filter string="Inactive" name="archived" domain="[('active', '=',False)]" />
+                <filter string="Under Maintenance" name="under_maintenance" domain="[('maintenance_open_count', '&gt;', 0)]" />
             </search>
         </field>
     </record>
@@ -190,11 +135,5 @@
             False), ('search_equipment_id', '=', active_id)]
         </field>
     </record>
-    <menuitem
-        id="menu_m_plan_form"
-        name="Maintenance Plans"
-        parent="maintenance.menu_m_request"
-        action="maintenance_plan_action"
-        groups="maintenance.group_equipment_manager,base.group_user"
-    />
+    <menuitem id="menu_m_plan_form" name="Maintenance Plans" parent="maintenance.menu_m_request" action="maintenance_plan_action" groups="maintenance.group_equipment_manager,base.group_user" />
 </odoo>

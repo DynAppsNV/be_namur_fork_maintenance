@@ -3,6 +3,8 @@
 
 import logging
 
+from odoo import SUPERUSER_ID, api
+
 
 def post_init_hook(env):
     logging.getLogger("odoo.addons.maintenance_stock").info(

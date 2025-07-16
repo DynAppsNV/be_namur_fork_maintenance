@@ -41,14 +41,14 @@ class PickingType(models.Model):
     _inherit = "stock.picking.type"
 
     @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if 'warehouse_id' in vals and not 'company_id' in vals:
-                company_id = self.env['stock.warehouse'].browse(vals['warehouse_id']).company_id.id
-                vals.update({
+    def create(self, vals):
+        for val in vals:
+            if 'warehouse_id' in val and not 'company_id' in val:
+                company_id = self.env['stock.warehouse'].browse(val['warehouse_id']).company_id.id
+                val.update({
                     'company_id': company_id,
                 })
 
-        picking_type = super().create(vals_list)
+        picking_type = super(PickingType, self).create(vals)
         return picking_type
 

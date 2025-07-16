@@ -56,6 +56,11 @@ msgid "Activity Type Icon"
 msgstr ""
 
 #. module: maintenance_plan
+#: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__generate_domain
+msgid "Apply on"
+msgstr ""
+
+#. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
 msgid "Archived"
 msgstr ""
@@ -151,6 +156,11 @@ msgid "Frequency"
 msgstr ""
 
 #. module: maintenance_plan
+#: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__generate_with_domain
+msgid "Generate With Domain"
+msgstr ""
+
+#. module: maintenance_plan
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
 msgid "Generate requests for current threshold"
 msgstr ""
@@ -184,7 +194,6 @@ msgstr ""
 
 #. module: maintenance_plan
 #: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_error
-#: model:ir.model.fields,help:maintenance_plan.field_maintenance_plan__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
@@ -262,6 +271,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__maintenance_count
 #: model_terms:ir.ui.view,arch_db:maintenance_plan.maintenance_plan_view_form
 msgid "Maintenance"
+msgstr ""
+
+#. module: maintenance_plan
+#: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_equipment__search_maintenance_plan_count
+msgid "Maintenance All Plan Count"
 msgstr ""
 
 #. module: maintenance_plan
@@ -498,8 +512,8 @@ msgid "Responsible User"
 msgstr ""
 
 #. module: maintenance_plan
-#: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__message_has_sms_error
-msgid "SMS Delivery error"
+#: model:ir.model.fields,field_description:maintenance_plan.field_maintenance_plan__search_equipment_id
+msgid "Search Equipment"
 msgstr ""
 
 #. module: maintenance_plan
@@ -585,6 +599,12 @@ msgstr ""
 #: code:addons/maintenance_plan/models/maintenance_equipment.py:0
 #, python-format
 msgid "Unspecified kind"
+msgstr ""
+
+#. module: maintenance_plan
+#: code:addons/maintenance_plan/models/maintenance_plan.py:0
+#, python-format
+msgid "Unsupported search operator"
 msgstr ""
 
 #. module: maintenance_plan

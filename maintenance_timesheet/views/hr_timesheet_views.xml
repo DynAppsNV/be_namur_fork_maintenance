@@ -4,9 +4,6 @@
         <field name="model">account.analytic.line</field>
         <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_search" />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='name']" position="after">
-                <field name="maintenance_request_id" />
-            </xpath>
             <xpath expr="//filter[@name='groupby_employee']" position="before">
                 <filter string="Request" name="groupby_request" domain="[]" context="{'group_by':'maintenance_request_id'}" />
             </xpath>

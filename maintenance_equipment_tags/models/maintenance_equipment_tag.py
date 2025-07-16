@@ -7,6 +7,7 @@ from odoo import fields, models
 
 
 class MaintenanceEquipmentTag(models.Model):
+
     _name = "maintenance.equipment.tag"
     _description = "Maintenance Equipment Tag"
 
