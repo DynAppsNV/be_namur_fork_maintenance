@@ -119,6 +119,11 @@ class MaintenanceEquipment(models.Model):
         horizon_date = fields.Date.today() + mtn_plan.get_relativedelta(
             mtn_plan.maintenance_plan_horizon, mtn_plan.planning_step or "year"
         )
+        if mtn_plan.maintenance_plan_horizon > 0:
+            base_date = 'request_date'
+        else:
+            base_date = self.env['ir.config_parameter'].sudo().get_param('maintenance.plan.base.date',
+                                                                         'done_date')
         # We check maintenance request already created and create until
         # planning horizon is met
         start_maintenance_date_plan = mtn_plan.start_maintenance_date
@@ -132,7 +137,7 @@ class MaintenanceEquipment(models.Model):
         )
         if furthest_maintenance_request:
             next_maintenance_date = (
-                furthest_maintenance_request.request_date
+                furthest_maintenance_request.get_base_maintenance_date(base_date)
                 + mtn_plan.get_relativedelta(
                     mtn_plan.interval, mtn_plan.interval_step or "year"
                 )
@@ -147,13 +152,20 @@ class MaintenanceEquipment(models.Model):
         )
         requests = request_model
         # Create maintenance request until we reach planning horizon
-        while next_maintenance_date <= horizon_date:
-            if next_maintenance_date >= fields.Date.today():
-                vals = self._prepare_requests_from_plan(mtn_plan, next_maintenance_date)
-                requests |= request_model.create(vals)
-            next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
-                mtn_plan.interval, mtn_plan.interval_step or "year"
-            )
+        if next_maintenance_date:
+            while next_maintenance_date <= horizon_date:
+                if next_maintenance_date >= fields.Date.today() and not self.maintenance_ids.filtered(
+                    lambda m: m.maintenance_plan_id.id == mtn_plan.id and m.request_date == next_maintenance_date
+                              and not m.stage_id.done
+                ):
+                    vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
+                    requests |= request_model.create(vals)
+                next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
+                    mtn_plan.interval, mtn_plan.interval_step or "year"
+                )
+        if not requests.search([("maintenance_plan_id", "=", mtn_plan.id), ('stage_id.done', '=', False)]):
+            vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
+            requests |= self.env["maintenance.request"].create(vals)
         return requests
 
     @api.model
