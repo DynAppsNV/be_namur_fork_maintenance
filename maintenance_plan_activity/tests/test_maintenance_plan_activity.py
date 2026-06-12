@@ -15,7 +15,6 @@ class TestMaintenancePlanActivity(test_common.TransactionCase):
         self.maintenance_equipment_obj = self.env["maintenance.equipment"]
         self.maintenance_planned_activity_obj = self.env["maintenance.planned.activity"]
         self.mail_activity_obj = self.env["mail.activity"]
-        self.cron = self.env.ref("maintenance.maintenance_requests_cron")
 
         self.equipment_1 = self.maintenance_equipment_obj.create({"name": "Laptop 1"})
         self.call = self.env["mail.activity.type"].search(
@@ -42,7 +41,7 @@ class TestMaintenancePlanActivity(test_common.TransactionCase):
         """Execute cron and check the request and the activities that have
         been created
         """
-        self.cron.method_direct_trigger()
+        self.env["maintenance.plan"].cron_create_maintenance_requests()
 
         generated_requests = self.maintenance_request_obj.search(
             [("maintenance_plan_id", "=", self.maintenance_plan_1.id)]

@@ -20,8 +20,12 @@ class MaintenanceEquipment(models.Model):
                 self._prepare_project_from_equipment_values()
             )
 
-    def _prepare_project_from_equipment_values(self):
+    def _prepare_project_from_equipment_values(self, values=None):
         """
-        Default project data creation hook
+        Default project data creation hook. ``values`` lets extending modules
+        (e.g. maintenance_timesheet) and callers seed/override the project vals.
         """
-        return {"name": self.name}
+        res = {"name": self.name}
+        if values:
+            res.update(values)
+        return res

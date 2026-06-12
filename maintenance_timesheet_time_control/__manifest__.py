@@ -4,7 +4,7 @@
 {
     "name": "Maintenance Timesheets Time Control",
     "summary": "Maintenance Timesheets Timesheet Time Control",
-    "version": "15.0.1.0.0",
+    "version": "19.0.1.0.0",
     "license": "AGPL-3",
     "category": "Hidden",
     "author": "Tecnativa,Odoo Community Association (OCA)",
@@ -13,4 +13,5 @@
     "data": ["views/maintenance_request_view.xml"],
     "auto_install": True,
     "maintainers": ["victoralmau"],
+    "installable": True,
 }

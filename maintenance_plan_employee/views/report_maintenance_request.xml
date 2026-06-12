@@ -9,7 +9,7 @@
                 <strong>Employees:</strong>
                 <p
                     class="m-0"
-                    t-esc="', '.join(map( lambda x: x.name, doc.employee_ids))"
+                    t-out="', '.join(map( lambda x: x.name, doc.employee_ids))"
                 />
             </div>
         </xpath>
