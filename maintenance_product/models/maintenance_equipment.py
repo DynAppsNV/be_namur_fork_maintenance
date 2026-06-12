@@ -25,8 +25,8 @@ class MaintenanceEquipment(models.Model):
             self.name = self.product_id.name
             self.cost = self.product_id.standard_price
             if self.product_id.seller_ids:
-                first_seller = fields.first(self.product_id.seller_ids)
-                self.partner_id = first_seller.name
+                first_seller = self.product_id.seller_ids[:1]
+                self.partner_id = first_seller.partner_id
                 self.partner_ref = first_seller.product_code
 
 

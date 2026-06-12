@@ -37,8 +37,11 @@ class MaintenanceStage(models.Model):
         help="For default, the system uses primary",
     )
 
-    def _get_stage_node_attrs(self):
-        return {"invisible": [("stage_id", "not in", self.previous_stage_ids.ids)]}
+    def _get_stage_node_invisible(self):
+        # v17+ replaced the legacy ``attrs`` modifier with direct attribute
+        # expressions: hide the button unless the current stage is one of the
+        # configured previous stages.
+        return "stage_id not in %s" % (self.previous_stage_ids.ids,)
 
     def _get_stage_node_name(self):
         return _("To %s") % self.name
@@ -52,7 +55,7 @@ class MaintenanceStage(models.Model):
                 "type": "object",
                 "class": "btn-%s" % (self.button_class or "primary"),
                 "context": json.dumps({"next_stage_id": self.id}),
-                "attrs": json.dumps(self._get_stage_node_attrs()),
+                "invisible": self._get_stage_node_invisible(),
                 "string": self._get_stage_node_name(),
             },
         )

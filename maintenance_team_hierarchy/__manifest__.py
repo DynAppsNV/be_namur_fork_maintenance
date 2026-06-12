@@ -5,11 +5,12 @@
     "name": "Maintenance Team Hierarchy",
     "summary": """
         Create hierarchies on teams""",
-    "version": "15.0.1.0.0",
+    "version": "19.0.1.0.0",
     "license": "AGPL-3",
     "author": "Creu Blanca,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/maintenance",
     "depends": ["maintenance"],
     "data": ["views/maintenance_team.xml"],
     "demo": ["demo/maintenance_team_demo.xml", "demo/maintenance_request_demo.xml"],
+    "installable": True,
 }

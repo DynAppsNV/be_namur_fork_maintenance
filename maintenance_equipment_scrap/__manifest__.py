@@ -8,7 +8,7 @@
     "maintainers": ["espo-tony"],
     "website": "https://github.com/OCA/maintenance",
     "category": "Human Resources",
-    "version": "15.0.1.0.1",
+    "version": "19.0.1.0.0",
     "license": "AGPL-3",
     "depends": ["maintenance", "mail"],
     "data": [
@@ -18,4 +18,5 @@
         "data/maintenance_data.xml",
         "security/ir.model.access.csv",
     ],
+    "installable": True,
 }
