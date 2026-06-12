@@ -5,7 +5,7 @@ ci: Travis
 dependency_installation_mode: PIP
 generate_requirements_txt: true
 include_wkhtmltopdf: false
-odoo_version: 14.0
+odoo_version: 19.0
 rebel_module_groups: []
 repo_description: 'TODO: add repo description.'
 repo_name: maintenance
