@@ -32,9 +32,6 @@ class MaintenanceEquipment(models.Model):
     )
     parent_path = fields.Char(index=True)
 
-    def name_get(self):
-        return [(equipment.id, equipment.complete_name) for equipment in self]
-
     @api.depends("child_ids")
     def _compute_child_count(self):
         for equipment in self:
