@@ -105,3 +105,16 @@ class TestMaintenanceTimesheet(test_common.TransactionCase):
             {"name": "my name"}
         )
         self.assertTrue(data["allow_timesheets"])
+
+    def test_action_create_project_no_values_with_timesheet(self):
+        """action_create_project() calls _prepare_project_from_equipment_values
+        with no argument; the timesheet override must accept that and still flag
+        the project for timesheets."""
+        equipment = self.env["maintenance.equipment"].create(
+            {"name": "Equipment needing a project"}
+        )
+        self.assertFalse(equipment.project_id)
+        equipment.action_create_project()
+        self.assertTrue(equipment.project_id)
+        self.assertEqual(equipment.project_id.name, "Equipment needing a project")
+        self.assertTrue(equipment.project_id.allow_timesheets)
