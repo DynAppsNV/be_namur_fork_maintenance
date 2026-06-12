@@ -130,6 +130,7 @@ class MaintenanceEquipment(models.Model):
         furthest_maintenance_request = self.env["maintenance.request"].search(
             [
                 ("maintenance_plan_id", "=", mtn_plan.id),
+                ("equipment_id", "=", self.id),
                 ("request_date", ">=", start_maintenance_date_plan),
             ],
             order="request_date desc",
@@ -163,7 +164,13 @@ class MaintenanceEquipment(models.Model):
                 next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
                     mtn_plan.interval, mtn_plan.interval_step or "year"
                 )
-        if not requests.search([("maintenance_plan_id", "=", mtn_plan.id), ('stage_id.done', '=', False)]):
+        if not requests.search(
+            [
+                ("maintenance_plan_id", "=", mtn_plan.id),
+                ("equipment_id", "=", self.id),
+                ("stage_id.done", "=", False),
+            ]
+        ):
             vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
             requests |= self.env["maintenance.request"].create(vals)
         return requests
@@ -180,8 +187,14 @@ class MaintenanceEquipment(models.Model):
             .search([("interval", ">", 0)])
             .filtered(lambda x: True if not x.equipment_id else x.equipment_id.active)
         ):
-            equipment = plan.equipment_id
-            equipment._create_new_request(plan)
+            if plan.generate_with_domain and not plan.equipment_id:
+                # Domain plans expand to every matching equipment.
+                for equipment in plan._get_maintenance_equipments():
+                    equipment._create_new_request(plan)
+            else:
+                # Single equipment, or an equipment-less plan that still
+                # generates unassigned requests on the empty recordset.
+                plan.equipment_id._create_new_request(plan)
 
     @api.depends(
         "maintenance_plan_ids.next_maintenance_date", "maintenance_ids.request_date"

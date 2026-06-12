@@ -33,7 +33,7 @@ class TestAccountMove(common.TransactionCase):
             {
                 "name": "Test Account",
                 "code": "TEST",
-                "user_type_id": cls.env.ref("account.data_account_type_payable").id,
+                "account_type": "liability_payable",
                 "reconcile": True,
             }
         )
@@ -41,7 +41,7 @@ class TestAccountMove(common.TransactionCase):
             {
                 "name": "Test Account",
                 "code": "ACC",
-                "user_type_id": cls.env.ref("account.data_account_type_expenses").id,
+                "account_type": "expense",
             }
         )
         cls.journal = cls.env["account.journal"].create(
@@ -67,11 +67,9 @@ class TestAccountMove(common.TransactionCase):
         with move_form.invoice_line_ids.new() as line_form:
             line_form.product_id = self.product_a
             line_form.quantity = 2
-            line_form.account_id = self.account_expense
         with move_form.invoice_line_ids.new() as line_form:
             line_form.product_id = self.product_b
             line_form.quantity = 2
-            line_form.account_id = self.account_expense
         invoice = move_form.save()
         return invoice
 
@@ -99,7 +97,7 @@ class TestAccountMove(common.TransactionCase):
         self.assertTrue(line_a.equipment_category_id)
         self.assertEqual(len(line_a.equipment_ids), 2)
         self.assertEqual(len(line_b.equipment_ids), 0)
-        equipment = fields.first(equipments)
+        equipment = equipments[:1]
         self.assertEqual(equipment.name, self.product_a.name)
         self.assertEqual(equipment.product_id, self.product_a)
         self.assertEqual(equipment.category_id.product_category_id, self.categ)
@@ -130,5 +128,5 @@ class TestAccountMove(common.TransactionCase):
         line_a = invoice.line_ids.filtered(lambda x: x.product_id == self.product_a)
         self.assertEqual(line_a.equipment_category_id, category)
         invoice.action_post()
-        equipment = fields.first(line_a.equipment_ids)
+        equipment = line_a.equipment_ids[:1]
         self.assertEqual(equipment.category_id, category)

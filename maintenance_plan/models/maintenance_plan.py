@@ -117,21 +117,22 @@ class MaintenancePlan(models.Model):
             "time": safe_eval.time,
         }
 
-    def name_get(self):
-        result = []
+    @api.depends("name", "maintenance_kind_id", "equipment_id")
+    def _compute_display_name(self):
+        # Override: name_get was removed in v17; fall back to a kind/equipment
+        # based label when the plan has no explicit name.
         for plan in self:
-            result.append(
-                (
-                    plan.id,
-                    plan.name
-                    or _(
-                        "Unnamed %(kind)s plan (%(eqpmt)s)",
-                        kind=plan.maintenance_kind_id.name or "",
-                        eqpmt=plan.equipment_id.name,
-                    ),
-                )
+            plan.display_name = plan.name or _(
+                "Unnamed %(kind)s plan (%(eqpmt)s)",
+                kind=plan.maintenance_kind_id.name or "",
+                eqpmt=plan.equipment_id.name,
             )
-        return result
+
+    @api.model
+    def cron_create_maintenance_requests(self):
+        # Entry point referenced by the ir.cron record; delegates to the
+        # equipment-side generator that walks every active plan.
+        self.env["maintenance.equipment"]._cron_generate_requests()
 
     @api.depends("maintenance_ids.stage_id.done")
     def _compute_maintenance_count(self):
@@ -233,14 +234,11 @@ class MaintenancePlan(models.Model):
                 )
         return super().unlink()
 
-    _sql_constraints = [
-        (
-            "equipment_kind_uniq",
-            "unique (equipment_id, maintenance_kind_id)",
-            "You cannot define multiple times the same maintenance kind on an "
-            "equipment maintenance plan.",
-        )
-    ]
+    _equipment_kind_uniq = models.Constraint(
+        "unique (equipment_id, maintenance_kind_id)",
+        "You cannot define multiple times the same maintenance kind on an "
+        "equipment maintenance plan.",
+    )
 
     def button_manual_request_generation(self):
         """Call the same method that the cron for generating manually the maintenance

@@ -43,7 +43,7 @@
                         </div>
                     </button>
             </xpath>
-            <xpath expr="//field[@name='location']" position="after">
+            <xpath expr="//field[@name='category_id']" position="after">
                     <field name="allow_consumptions" groups="stock.group_stock_user"/>
                     <field name="default_consumption_warehouse_id" invisible="not allow_consumptions" required="allow_consumptions" groups="stock.group_stock_user"/>
             </xpath>

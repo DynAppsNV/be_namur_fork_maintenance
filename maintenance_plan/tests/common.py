@@ -26,7 +26,9 @@ class TestMaintenancePlanBase(test_common.TransactionCase):
         cls.maintenance_request_obj = cls.env["maintenance.request"]
         cls.maintenance_plan_obj = cls.env["maintenance.plan"]
         cls.maintenance_equipment_obj = cls.env["maintenance.equipment"]
-        cls.cron = cls.env.ref("maintenance.maintenance_requests_cron")
+        cls.cron = cls.env.ref(
+            "maintenance_plan.ir_cron_create_maintenance_requests"
+        )
         cls.weekly_kind = cls.env.ref("maintenance_plan.maintenance_kind_weekly")
         cls.done_stage = cls.env.ref("maintenance.stage_3")
 

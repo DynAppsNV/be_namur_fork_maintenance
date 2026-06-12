@@ -36,7 +36,7 @@
             </progressbar>
             <xpath expr="//footer" position="before">
                 <div class="badge badge-primary" t-if="record.status_id.value">
-                    <t t-esc="record.status_id.value" />
+                    <t t-out="record.status_id.value" />
                 </div>
             </xpath>
         </field>

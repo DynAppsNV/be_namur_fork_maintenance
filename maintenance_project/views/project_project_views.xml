@@ -4,7 +4,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.view_project_kanban" />
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='rating_active']" position="before">
+            <xpath expr="//field[@name='show_ratings']" position="before">
                 <field
                     name="equipment_count"
                     groups="maintenance.group_equipment_manager"
@@ -23,7 +23,7 @@
                 >
                     <div>
                         <span class="o_value">
-                            <t t-esc="record.equipment_count.value" />
+                            <t t-out="record.equipment_count.value" />
                         </span>
                         <span class="o_label">Equipments</span>
                     </div>
@@ -36,7 +36,7 @@
                 >
                     <div>
                         <span class="o_value">
-                            <t t-esc="record.maintenance_request_count.value" />
+                            <t t-out="record.maintenance_request_count.value" />
                         </span>
                         <span class="o_label">Requests</span>
                     </div>

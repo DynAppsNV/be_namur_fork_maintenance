@@ -82,8 +82,8 @@ class AccountMoveLine(models.Model):
                 item.product_id.maintenance_ok
                 and item.product_id.product_tmpl_id.categ_id.equipment_category_ids
             ):
-                item.equipment_category_id = fields.first(
-                    item.product_id.product_tmpl_id.categ_id.equipment_category_ids
+                item.equipment_category_id = (
+                    item.product_id.product_tmpl_id.categ_id.equipment_category_ids[:1]
                 )
             else:
                 item.equipment_category_id = item.equipment_category_id
@@ -103,9 +103,9 @@ class AccountMoveLine(models.Model):
     def _set_equipment_category(self):
         if not self.equipment_category_id:
             category_model = self.env["maintenance.equipment.category"].sudo()
-            category = fields.first(
-                self.product_id.product_tmpl_id.categ_id.equipment_category_ids
-            )
+            category = self.product_id.product_tmpl_id.categ_id.equipment_category_ids[
+                :1
+            ]
             if not category:
                 category = category_model.create(
                     self._prepare_equipment_category_vals()

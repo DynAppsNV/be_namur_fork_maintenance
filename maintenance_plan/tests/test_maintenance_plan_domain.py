@@ -8,7 +8,7 @@ from odoo.addons.maintenance_plan.tests.common import TestMaintenancePlanBase
 
 class TestMaintenancePlanDomain(TestMaintenancePlanBase):
     def test_generate_requests_no_domain(self):
-        self.cron.method_direct_trigger()
+        self.maintenance_plan_obj.cron_create_maintenance_requests()
         generated_requests = self.maintenance_request_obj.search(
             [("maintenance_plan_id", "=", self.maintenance_plan_5.id)],
             order="schedule_date asc",
@@ -27,7 +27,7 @@ class TestMaintenancePlanDomain(TestMaintenancePlanBase):
                 ),
             }
         )
-        self.cron.method_direct_trigger()
+        self.maintenance_plan_obj.cron_create_maintenance_requests()
         generated_requests = self.maintenance_request_obj.search(
             [("maintenance_plan_id", "=", self.maintenance_plan_5.id)],
             order="schedule_date asc",
