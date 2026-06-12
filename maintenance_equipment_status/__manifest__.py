@@ -14,6 +14,11 @@
         "views/maintenance_equipment_views.xml",
     ],
     "demo": ["data/demo_maintenance_equipment_status.xml"],
+    "assets": {
+        "web.assets_tests": [
+            "maintenance_equipment_status/static/tests/tours/equipment_status_kanban_tour.esm.js",
+        ],
+    },
     "installable": True,
     "auto_install": False,
     "application": False,

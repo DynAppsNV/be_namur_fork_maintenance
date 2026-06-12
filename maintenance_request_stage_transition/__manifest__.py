@@ -12,6 +12,11 @@
     "depends": ["maintenance"],
     "data": ["views/maintenance_request.xml", "views/maintenance_stage.xml"],
     "demo": ["data/demo_maintenance_request_stage_transition.xml"],
+    "assets": {
+        "web.assets_tests": [
+            "maintenance_request_stage_transition/static/tests/tours/stage_transition_tour.esm.js",
+        ],
+    },
     "maintainers": ["etobella"],
     "installable": True,
 }
