@@ -3,7 +3,7 @@
 
 from random import randint
 
-from odoo import fields, models
+from odoo import _, fields, models
 
 
 class MaintenanceEquipmentTag(models.Model):
@@ -13,6 +13,14 @@ class MaintenanceEquipmentTag(models.Model):
 
     def get_default_color_value(self):
         return randint(1, 15)
+
+    def copy_data(self, default=None):
+        # The name is unique, so a plain duplicate would violate the
+        # constraint; suffix it to keep "Duplicate" working.
+        vals_list = super().copy_data(default=default)
+        for tag, vals in zip(self, vals_list):
+            vals["name"] = _("%s (copy)") % tag.name
+        return vals_list
 
     name = fields.Char(string="Equipment Tag", required=True)
     color = fields.Integer(

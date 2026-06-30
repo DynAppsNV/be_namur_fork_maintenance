@@ -56,3 +56,11 @@ class TestMaintenanceEquipmentTag(TransactionCase):
         found = self.Tag.search([("equipment_ids", "in", self.equipment_a.ids)])
         self.assertIn(self.tag, found)
         self.assertNotIn(unlinked, found)
+
+    def test_copy_suffixes_name(self):
+        """Duplicating a tag must not violate the unique-name constraint: the
+        copy's name is suffixed and the original is untouched."""
+        copy = self.tag.copy()
+        self.assertEqual(copy.name, "Servers (copy)")
+        self.assertEqual(self.tag.name, "Servers")
+        self.assertNotEqual(copy, self.tag)
