@@ -39,6 +39,29 @@ class TestMaintenanceTimesheet(test_common.TransactionCase):
             self.request2.timesheet_total_hours, self.timesheet21_data["unit_amount"]
         )
 
+    def test_write_multi_record_different_requests(self):
+        """Writing a recordset of timesheets linked to different (not-done)
+        requests must not raise a singleton error."""
+        ts1 = self.request2.timesheet_ids[:1]
+        ts2 = self.env["account.analytic.line"].create(
+            {
+                "name": "Other request work",
+                "project_id": self.request_demo1.project_id.id,
+                "maintenance_request_id": self.request_demo1.id,
+                "user_id": self.env.ref("base.user_admin").id,
+                "date": fields.Date.today(),
+                "unit_amount": 1.0,
+            }
+        )
+        combined = ts1 | ts2
+        self.assertEqual(
+            combined.mapped("maintenance_request_id"),
+            self.request2 | self.request_demo1,
+        )
+        combined.write({"unit_amount": 2.0})
+        self.assertEqual(ts1.unit_amount, 2.0)
+        self.assertEqual(ts2.unit_amount, 2.0)
+
     def test_onchange_maintenance_request_id(self):
         ts1 = self.env["account.analytic.line"].new(
             {

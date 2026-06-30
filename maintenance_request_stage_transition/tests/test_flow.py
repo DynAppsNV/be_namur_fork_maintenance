@@ -5,6 +5,7 @@ import json
 
 from lxml import etree
 
+from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 from odoo.tools.safe_eval import safe_eval
 
@@ -40,6 +41,17 @@ class TestFlow(TransactionCase):
                 {"stage_id": self.request.stage_id.id},
             )
         )
+
+    def test_invalid_transition_raises(self):
+        """Moving to a stage that is not a configured next stage is rejected
+        server-side, not only hidden in the UI."""
+        # last_stage is reachable only from self.stage, not from original_stage.
+        self.assertNotIn(self.last_stage, self.request.stage_id.next_stage_ids)
+        with self.assertRaises(UserError):
+            self.request.with_context(
+                next_stage_id=self.last_stage.id
+            ).set_maintenance_stage()
+        self.assertEqual(self.request.stage_id, self.original_stage)
 
     def test_nochange(self):
         self.request.set_maintenance_stage()
