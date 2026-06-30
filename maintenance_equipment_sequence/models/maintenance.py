@@ -74,7 +74,8 @@ class MaintenanceEquipmentCategory(models.Model):
                     self.env["ir.sequence"].browse(vals["sequence_id"]).prefix
                 )
         result = super().create(vals_list)
-        self._compute_equipment_code()
+        # Run on the created categories (self is the empty model recordset here).
+        result._compute_equipment_code()
         return result
 
     def write(self, vals):
@@ -86,7 +87,10 @@ class MaintenanceEquipmentCategory(models.Model):
                 self.env["ir.sequence"].browse(vals["sequence_id"]).prefix
             )
         result = super(MaintenanceEquipmentCategory, self).write(vals)
-        self._compute_equipment_code()
+        # Only back-fill serials when the sequence config actually changed,
+        # otherwise every unrelated write would re-scan the category's equipment.
+        if "sequence_id" in vals or "sequence_prefix" in vals:
+            self._compute_equipment_code()
         return result
 
     @api.onchange("sequence_id")
@@ -95,14 +99,21 @@ class MaintenanceEquipmentCategory(models.Model):
             self.sequence_prefix = self.sequence_id.prefix
 
     def _compute_equipment_code(self):
-        for category in self:
-            if category.sequence_id:
-                category_equipments = category.env["maintenance.equipment"].search(
-                    [("category_id", "=", category.id)]
-                )
-                for equipment in category_equipments:
-                    if not equipment.serial_no and equipment.category_id.sequence_id:
-                        equipment.serial_no = equipment.category_id.sequence_id._next()
+        categories = self.filtered("sequence_id")
+        if not categories:
+            return
+        # Single search instead of one per category, scoped to equipment that
+        # still need a serial.
+        equipments = self.env["maintenance.equipment"].search(
+            [
+                ("category_id", "in", categories.ids),
+                ("serial_no", "in", (False, "")),
+            ]
+        )
+        for equipment in equipments:
+            sequence = equipment.category_id.sequence_id
+            if sequence:
+                equipment.serial_no = sequence._next()
 
 
 class MaintenanceEquipment(models.Model):
