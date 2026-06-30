@@ -102,3 +102,50 @@ class TestMaintenancePlanDomain(TestMaintenancePlanBase):
             [("maintenance_plan_id", "=", self.maintenance_plan_5.id)]
         )
         self.assertEqual(second_run, first_run)
+
+    def test_button_generation_expands_domain(self):
+        """The manual button expands a domain plan per matched equipment, the
+        same as the cron (no equipment-less requests)."""
+        equipment_2 = self.maintenance_equipment_obj.create({"name": "Laptop 2"})
+        self.maintenance_plan_5.write(
+            {
+                "generate_with_domain": True,
+                "generate_domain": json.dumps(
+                    [("id", "in", [equipment_2.id, self.equipment_1.id])]
+                ),
+            }
+        )
+        self.maintenance_plan_5.button_manual_request_generation()
+        requests = self.maintenance_request_obj.search(
+            [("maintenance_plan_id", "=", self.maintenance_plan_5.id)]
+        )
+        self.assertEqual(len(requests), 6)
+        self.assertEqual(
+            requests.mapped("equipment_id"), self.equipment_1 | equipment_2
+        )
+        self.assertFalse(requests.filtered(lambda r: not r.equipment_id))
+
+    def test_cron_isolates_a_failing_plan(self):
+        """A plan whose generate_domain raises must not abort generation for the
+        other plans (per-plan savepoint)."""
+        broken = self.maintenance_plan_obj.create(
+            {
+                "start_maintenance_date": "2023-01-25",
+                "interval": 1,
+                "interval_step": "month",
+                "maintenance_plan_horizon": 2,
+                "planning_step": "month",
+                "generate_with_domain": True,
+                "generate_domain": "undefined_name_boom",  # raises in safe_eval
+            }
+        )
+        # Must not raise, despite the broken plan.
+        self.maintenance_plan_obj.cron_create_maintenance_requests()
+        good = self.maintenance_request_obj.search(
+            [("maintenance_plan_id", "=", self.maintenance_plan_1.id)]
+        )
+        self.assertEqual(len(good), 3)
+        broken_reqs = self.maintenance_request_obj.search(
+            [("maintenance_plan_id", "=", broken.id)]
+        )
+        self.assertFalse(broken_reqs)

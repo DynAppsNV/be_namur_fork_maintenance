@@ -165,8 +165,9 @@ class MaintenancePlan(models.Model):
             return relativedelta(weeks=interval)
         elif step == "month":
             return relativedelta(months=interval)
-        elif step == "year":
-            return relativedelta(years=interval)
+        # Default to year for "year" and any falsy/unknown step, so the result
+        # is never None (callers add it to a date).
+        return relativedelta(years=interval)
 
     @api.depends(
         "interval",
@@ -209,7 +210,7 @@ class MaintenancePlan(models.Model):
                         last_maintenance_done.get_base_maintenance_date() + interval_timedelta
                     )
                 else:
-                    next_date = plan.start_maintenance_date
+                    next_date = plan.start_maintenance_date or fields.Date.today()
                     while next_date < fields.Date.today():
                         next_date = next_date + interval_timedelta
                     plan.next_maintenance_date = next_date
@@ -256,12 +257,19 @@ class MaintenancePlan(models.Model):
         "equipment maintenance plan.",
     )
 
+    def _generate_requests(self):
+        """Generate the maintenance requests for one plan, expanding domain
+        plans to every matching equipment. Shared by the cron and the manual
+        button so both behave identically."""
+        self.ensure_one()
+        for equipment in self._get_maintenance_equipments():
+            equipment._create_new_request(self)
+
     def button_manual_request_generation(self):
-        """Call the same method that the cron for generating manually the maintenance
-        requests."""
+        """Generate the maintenance requests manually, mirroring the cron
+        (domain plans included)."""
         for plan in self:
-            equipment = plan.equipment_id
-            equipment._create_new_request(plan)
+            plan._generate_requests()
 
     def _get_maintenance_equipments(self):
         self.ensure_one()
