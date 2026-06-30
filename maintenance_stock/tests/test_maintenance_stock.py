@@ -70,6 +70,18 @@ class TestMaintenanceStock(test_common.TransactionCase):
             self.maintenance_warehouse.in_type_id,
         )
 
+    def test_rename_updates_core_and_cons_sequences(self):
+        """Renaming the warehouse code must keep core's sequence rename (super)
+        AND re-prefix the consumption sequence with the new code."""
+        wh = self.maintenance_warehouse
+        self.assertEqual(wh.cons_type_id.sequence_id.prefix, "TEST/CONS/")
+        self.assertTrue(wh.out_type_id.sequence_id.prefix.startswith("TEST"))
+        wh.write({"code": "NEWC"})
+        # core standard sequences still renamed (super was called)
+        self.assertTrue(wh.out_type_id.sequence_id.prefix.startswith("NEWC"))
+        # consumption sequence re-prefixed with the new code
+        self.assertEqual(wh.cons_type_id.sequence_id.prefix, "NEWC/CONS/")
+
     def test_equipment(self):
         self.assertTrue(self.equipment_1.default_consumption_warehouse_id)
         self.equipment_1.allow_consumptions = False
