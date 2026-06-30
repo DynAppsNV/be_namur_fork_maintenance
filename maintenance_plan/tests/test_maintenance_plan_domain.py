@@ -7,6 +7,24 @@ from odoo.addons.maintenance_plan.tests.common import TestMaintenancePlanBase
 
 
 class TestMaintenancePlanDomain(TestMaintenancePlanBase):
+    def test_search_equipment_id_operators(self):
+        """The search_equipment_id custom search must accept both "=" and the
+        "in" form (v19's optimizer normalises "=" to an "in" with an OrderedSet),
+        without raising. Regression for the equipment view crash on v19."""
+        Plan = self.maintenance_plan_obj
+        eq_result = Plan.search(
+            [("search_equipment_id", "=", self.equipment_1.id)]
+        )
+        # plans 1-3 target equipment_1 directly; plan_4 has no equipment.
+        self.assertIn(self.maintenance_plan_1, eq_result)
+        self.assertIn(self.maintenance_plan_2, eq_result)
+        self.assertIn(self.maintenance_plan_3, eq_result)
+        self.assertNotIn(self.maintenance_plan_4, eq_result)
+        in_result = Plan.search(
+            [("search_equipment_id", "in", [self.equipment_1.id])]
+        )
+        self.assertEqual(eq_result, in_result)
+
     def test_generate_requests_no_domain(self):
         self.maintenance_plan_obj.cron_create_maintenance_requests()
         generated_requests = self.maintenance_request_obj.search(

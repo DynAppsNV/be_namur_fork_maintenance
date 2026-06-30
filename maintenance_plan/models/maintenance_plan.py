@@ -88,19 +88,35 @@ class MaintenancePlan(models.Model):
 
     @api.model
     def _search_search_equipment(self, operator, value):
-        if operator != "=" or (not value and not isinstance(value, models.NewId)):
-            raise ValueError(_("Unsupported search operator"))
-        plans = self.search([("generate_with_domain", "=", True)])
+        # v19's domain optimizer normalises "=" on a relational searchable
+        # field to "in" with a list, so accept both equality and containment
+        # forms (and their negations).
+        if operator not in ("=", "!=", "in", "not in"):
+            raise ValueError(_("Unsupported search operator %s") % (operator,))
+        # v19 may pass the value as a bare id, a NewId, or an iterable
+        # (list/tuple/OrderedSet) of ids for "in"/"not in".
+        if value is False or value is None:
+            equipment_ids = []
+        elif isinstance(value, int):
+            equipment_ids = [value]
+        else:
+            try:
+                equipment_ids = [v for v in value if v]
+            except TypeError:
+                equipment_ids = [value]
+        equipment = self.env["maintenance.equipment"].browse(equipment_ids)
         plan_ids = []
-        equipment = self.env["maintenance.equipment"].browse(value)
-        for plan in plans:
+        for plan in self.search([("generate_with_domain", "=", True)]):
             if equipment.filtered_domain(
                 safe_eval.safe_eval(
                     plan.generate_domain or "[]", plan._get_eval_context()
                 )
             ):
                 plan_ids.append(plan.id)
-        return ["|", ("equipment_id", "=", value), ("id", "in", plan_ids)]
+        domain = ["|", ("equipment_id", "in", equipment_ids), ("id", "in", plan_ids)]
+        if operator in ("!=", "not in"):
+            return ["!"] + domain
+        return domain
 
     @api.depends("equipment_id")
     def _compute_search_equipment(self):
