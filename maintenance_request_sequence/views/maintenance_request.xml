@@ -14,7 +14,7 @@
                     <field
                         name="code"
                         nolabel="1"
-                        attrs="{'invisible': [('code', '=', '/')]}"
+                        invisible="code == '/'"
                     />
                 </strong>
             </xpath>

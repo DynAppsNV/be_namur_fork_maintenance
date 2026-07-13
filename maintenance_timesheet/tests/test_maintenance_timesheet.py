@@ -39,6 +39,29 @@ class TestMaintenanceTimesheet(test_common.TransactionCase):
             self.request2.timesheet_total_hours, self.timesheet21_data["unit_amount"]
         )
 
+    def test_write_multi_record_different_requests(self):
+        """Writing a recordset of timesheets linked to different (not-done)
+        requests must not raise a singleton error."""
+        ts1 = self.request2.timesheet_ids[:1]
+        ts2 = self.env["account.analytic.line"].create(
+            {
+                "name": "Other request work",
+                "project_id": self.request_demo1.project_id.id,
+                "maintenance_request_id": self.request_demo1.id,
+                "user_id": self.env.ref("base.user_admin").id,
+                "date": fields.Date.today(),
+                "unit_amount": 1.0,
+            }
+        )
+        combined = ts1 | ts2
+        self.assertEqual(
+            combined.mapped("maintenance_request_id"),
+            self.request2 | self.request_demo1,
+        )
+        combined.write({"unit_amount": 2.0})
+        self.assertEqual(ts1.unit_amount, 2.0)
+        self.assertEqual(ts2.unit_amount, 2.0)
+
     def test_onchange_maintenance_request_id(self):
         ts1 = self.env["account.analytic.line"].new(
             {
@@ -105,3 +128,16 @@ class TestMaintenanceTimesheet(test_common.TransactionCase):
             {"name": "my name"}
         )
         self.assertTrue(data["allow_timesheets"])
+
+    def test_action_create_project_no_values_with_timesheet(self):
+        """action_create_project() calls _prepare_project_from_equipment_values
+        with no argument; the timesheet override must accept that and still flag
+        the project for timesheets."""
+        equipment = self.env["maintenance.equipment"].create(
+            {"name": "Equipment needing a project"}
+        )
+        self.assertFalse(equipment.project_id)
+        equipment.action_create_project()
+        self.assertTrue(equipment.project_id)
+        self.assertEqual(equipment.project_id.name, "Equipment needing a project")
+        self.assertTrue(equipment.project_id.allow_timesheets)

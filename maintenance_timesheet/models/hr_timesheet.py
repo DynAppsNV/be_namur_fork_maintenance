@@ -26,10 +26,12 @@ class AccountAnalyticLine(models.Model):
         return super().create(values)
 
     def write(self, values):
-        current_request = self.maintenance_request_id
+        # Iterate: self may hold timesheets on different requests, so reading
+        # self.maintenance_request_id.id directly would raise on a multi set.
+        for timesheet in self:
+            if timesheet.maintenance_request_id:
+                self._check_request_done(timesheet.maintenance_request_id.id)
         new_request_id = values.get("maintenance_request_id", False)
-        if current_request:
-            self._check_request_done(current_request.id)
         if new_request_id:
             self._check_request_done(new_request_id)
         return super().write(values)

@@ -88,19 +88,35 @@ class MaintenancePlan(models.Model):
 
     @api.model
     def _search_search_equipment(self, operator, value):
-        if operator != "=" or (not value and not isinstance(value, models.NewId)):
-            raise ValueError(_("Unsupported search operator"))
-        plans = self.search([("generate_with_domain", "=", True)])
+        # v19's domain optimizer normalises "=" on a relational searchable
+        # field to "in" with a list, so accept both equality and containment
+        # forms (and their negations).
+        if operator not in ("=", "!=", "in", "not in"):
+            raise ValueError(_("Unsupported search operator %s") % (operator,))
+        # v19 may pass the value as a bare id, a NewId, or an iterable
+        # (list/tuple/OrderedSet) of ids for "in"/"not in".
+        if value is False or value is None:
+            equipment_ids = []
+        elif isinstance(value, int):
+            equipment_ids = [value]
+        else:
+            try:
+                equipment_ids = [v for v in value if v]
+            except TypeError:
+                equipment_ids = [value]
+        equipment = self.env["maintenance.equipment"].browse(equipment_ids)
         plan_ids = []
-        equipment = self.env["maintenance.equipment"].browse(value)
-        for plan in plans:
+        for plan in self.search([("generate_with_domain", "=", True)]):
             if equipment.filtered_domain(
                 safe_eval.safe_eval(
                     plan.generate_domain or "[]", plan._get_eval_context()
                 )
             ):
                 plan_ids.append(plan.id)
-        return ["|", ("equipment_id", "=", value), ("id", "in", plan_ids)]
+        domain = ["|", ("equipment_id", "in", equipment_ids), ("id", "in", plan_ids)]
+        if operator in ("!=", "not in"):
+            return ["!"] + domain
+        return domain
 
     @api.depends("equipment_id")
     def _compute_search_equipment(self):
@@ -117,21 +133,22 @@ class MaintenancePlan(models.Model):
             "time": safe_eval.time,
         }
 
-    def name_get(self):
-        result = []
+    @api.depends("name", "maintenance_kind_id", "equipment_id")
+    def _compute_display_name(self):
+        # Override: name_get was removed in v17; fall back to a kind/equipment
+        # based label when the plan has no explicit name.
         for plan in self:
-            result.append(
-                (
-                    plan.id,
-                    plan.name
-                    or _(
-                        "Unnamed %(kind)s plan (%(eqpmt)s)",
-                        kind=plan.maintenance_kind_id.name or "",
-                        eqpmt=plan.equipment_id.name,
-                    ),
-                )
+            plan.display_name = plan.name or _(
+                "Unnamed %(kind)s plan (%(eqpmt)s)",
+                kind=plan.maintenance_kind_id.name or "",
+                eqpmt=plan.equipment_id.name,
             )
-        return result
+
+    @api.model
+    def cron_create_maintenance_requests(self):
+        # Entry point referenced by the ir.cron record; delegates to the
+        # equipment-side generator that walks every active plan.
+        self.env["maintenance.equipment"]._cron_generate_requests()
 
     @api.depends("maintenance_ids.stage_id.done")
     def _compute_maintenance_count(self):
@@ -148,8 +165,9 @@ class MaintenancePlan(models.Model):
             return relativedelta(weeks=interval)
         elif step == "month":
             return relativedelta(months=interval)
-        elif step == "year":
-            return relativedelta(years=interval)
+        # Default to year for "year" and any falsy/unknown step, so the result
+        # is never None (callers add it to a date).
+        return relativedelta(years=interval)
 
     @api.depends(
         "interval",
@@ -192,7 +210,7 @@ class MaintenancePlan(models.Model):
                         last_maintenance_done.get_base_maintenance_date() + interval_timedelta
                     )
                 else:
-                    next_date = plan.start_maintenance_date
+                    next_date = plan.start_maintenance_date or fields.Date.today()
                     while next_date < fields.Date.today():
                         next_date = next_date + interval_timedelta
                     plan.next_maintenance_date = next_date
@@ -233,21 +251,25 @@ class MaintenancePlan(models.Model):
                 )
         return super().unlink()
 
-    _sql_constraints = [
-        (
-            "equipment_kind_uniq",
-            "unique (equipment_id, maintenance_kind_id)",
-            "You cannot define multiple times the same maintenance kind on an "
-            "equipment maintenance plan.",
-        )
-    ]
+    _equipment_kind_uniq = models.Constraint(
+        "unique (equipment_id, maintenance_kind_id)",
+        "You cannot define multiple times the same maintenance kind on an "
+        "equipment maintenance plan.",
+    )
+
+    def _generate_requests(self):
+        """Generate the maintenance requests for one plan, expanding domain
+        plans to every matching equipment. Shared by the cron and the manual
+        button so both behave identically."""
+        self.ensure_one()
+        for equipment in self._get_maintenance_equipments():
+            equipment._create_new_request(self)
 
     def button_manual_request_generation(self):
-        """Call the same method that the cron for generating manually the maintenance
-        requests."""
+        """Generate the maintenance requests manually, mirroring the cron
+        (domain plans included)."""
         for plan in self:
-            equipment = plan.equipment_id
-            equipment._create_new_request(plan)
+            plan._generate_requests()
 
     def _get_maintenance_equipments(self):
         self.ensure_one()

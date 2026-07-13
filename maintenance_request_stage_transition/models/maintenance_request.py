@@ -3,9 +3,8 @@
 
 from lxml import etree
 
-from odoo import api, fields, models
-
-from odoo.addons.base.models import ir_ui_view
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class MaintenanceRequest(models.Model):
@@ -15,24 +14,19 @@ class MaintenanceRequest(models.Model):
     stage_id = fields.Many2one("maintenance.stage", readonly=True)
 
     @api.model
-    def fields_view_get(
-        self, view_id=None, view_type="form", toolbar=False, submenu=False
-    ):
-        res = super().fields_view_get(
-            view_id=view_id,
-            view_type=view_type,
-            toolbar=toolbar,
-            submenu=submenu,
-        )
+    def get_view(self, view_id=None, view_type="form", **options):
+        res = super().get_view(view_id=view_id, view_type=view_type, **options)
         if view_type == "form":
             doc = etree.XML(res["arch"])
-            stages = self.env["maintenance.stage"].search([], order="sequence desc")
-            header = doc.xpath("//form/header")[0]
-            for stage in stages:
-                node = stage._get_stage_node()
-                self._setup_modifiers(node)
-                header.insert(0, node)
-            res["arch"] = etree.tostring(doc, encoding="unicode")
+            headers = doc.xpath("//form/header")
+            if headers:
+                stages = self.env["maintenance.stage"].search(
+                    [], order="sequence desc"
+                )
+                header = headers[0]
+                for stage in stages:
+                    header.insert(0, stage._get_stage_node())
+                res["arch"] = etree.tostring(doc, encoding="unicode")
         return res
 
     def set_maintenance_stage(self):
@@ -41,10 +35,19 @@ class MaintenanceRequest(models.Model):
         return self._set_maintenance_stage(self.env.context.get("next_stage_id"))
 
     def _set_maintenance_stage(self, stage_id):
+        # The UI "invisible" modifier only hides invalid buttons; enforce the
+        # allowed transition server-side too (and guard against multi/scripted
+        # callers writing the same target to unrelated requests).
+        self.ensure_one()
+        target = self.env["maintenance.stage"].browse(stage_id)
+        if target not in self.stage_id.next_stage_ids:
+            raise UserError(
+                _(
+                    "Cannot move %(req)s to stage %(stage)s: it is not an "
+                    "allowed next stage from %(current)s.",
+                    req=self.display_name,
+                    stage=target.display_name,
+                    current=self.stage_id.display_name,
+                )
+            )
         self.write({"stage_id": stage_id})
-
-    @api.model
-    def _setup_modifiers(self, node):
-        modifiers = {}
-        ir_ui_view.transfer_node_to_modifiers(node, modifiers)
-        ir_ui_view.transfer_modifiers_to_node(modifiers, node)

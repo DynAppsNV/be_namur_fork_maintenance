@@ -27,9 +27,15 @@ class StockWarehouse(models.Model):
         return warehouse_data
 
     def _update_name_and_code(self, new_name=False, new_code=False):
+        # Keep core's rename of locations, routes and standard sequences, then
+        # update the consumption sequence with the NEW name/code.
+        res = super()._update_name_and_code(new_name, new_code)
         for warehouse in self:
-            sequence_data = warehouse._get_sequence_values()
+            sequence_data = warehouse._get_sequence_values(
+                name=new_name, code=new_code
+            )
             warehouse.cons_type_id.sequence_id.write(sequence_data["cons_type_id"])
+        return res
 
     def _get_picking_type_create_values(self, max_sequence):
         data, max_sequence_new = super()._get_picking_type_create_values(max_sequence)
@@ -55,8 +61,8 @@ class StockWarehouse(models.Model):
     def _get_sequence_values(self, name=False, code=False):
         data = super()._get_sequence_values(name, code)
         data['cons_type_id'] = {
-                "name": self.name + " " + _("Sequence consumption"),
-                "prefix": self.code + "/CONS/",
+                "name": (name or self.name) + " " + _("Sequence consumption"),
+                "prefix": (code or self.code) + "/CONS/",
                 "padding": 5,
                 "company_id": self.company_id.id,
             }

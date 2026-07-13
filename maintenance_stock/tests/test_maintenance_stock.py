@@ -18,9 +18,9 @@ class TestMaintenanceStock(test_common.TransactionCase):
             {
                 "default_code": "TESTOPROD",
                 "name": "Test prod",
-                "type": "product",
+                "type": "consu",
+                "is_storable": True,
                 "uom_id": self.env.ref("uom.product_uom_unit").id,
-                "uom_po_id": self.env.ref("uom.product_uom_unit").id,
             }
         )
 
@@ -70,6 +70,18 @@ class TestMaintenanceStock(test_common.TransactionCase):
             self.maintenance_warehouse.in_type_id,
         )
 
+    def test_rename_updates_core_and_cons_sequences(self):
+        """Renaming the warehouse code must keep core's sequence rename (super)
+        AND re-prefix the consumption sequence with the new code."""
+        wh = self.maintenance_warehouse
+        self.assertEqual(wh.cons_type_id.sequence_id.prefix, "TEST/CONS/")
+        self.assertTrue(wh.out_type_id.sequence_id.prefix.startswith("TEST"))
+        wh.write({"code": "NEWC"})
+        # core standard sequences still renamed (super was called)
+        self.assertTrue(wh.out_type_id.sequence_id.prefix.startswith("NEWC"))
+        # consumption sequence re-prefixed with the new code
+        self.assertEqual(wh.cons_type_id.sequence_id.prefix, "NEWC/CONS/")
+
     def test_equipment(self):
         self.assertTrue(self.equipment_1.default_consumption_warehouse_id)
         self.equipment_1.allow_consumptions = False
@@ -118,12 +130,11 @@ class TestMaintenanceStock(test_common.TransactionCase):
                 "picking_type_id": self.maintenance_warehouse.cons_type_id.id,
                 "location_id": lot_stock_id,
                 "location_dest_id": wh_cons_loc_id,
-                "move_lines": [
+                "move_ids": [
                     (
                         0,
                         0,
                         {
-                            "name": "Test move",
                             "product_id": self.product1.id,
                             "product_uom": self.env.ref("uom.product_uom_unit").id,
                             "product_uom_qty": 5.0,
@@ -139,7 +150,7 @@ class TestMaintenanceStock(test_common.TransactionCase):
                                         "product_uom_id": self.env.ref(
                                             "uom.product_uom_unit"
                                         ).id,
-                                        "qty_done": qty_done,
+                                        "quantity": qty_done,
                                         "location_id": lot_stock_id,
                                         "location_dest_id": wh_cons_loc_id,
                                     },
@@ -167,7 +178,8 @@ class TestMaintenanceStock(test_common.TransactionCase):
         self.assertEqual(stock_quant_obj.search(domain_to).quantity, 0)
 
         picking.action_confirm()
-        picking.action_done()
+        picking.move_ids.picked = True
+        picking._action_done()
 
         self.assertEqual(stock_quant_obj.search(domain_from).quantity, -qty_done)
         self.assertEqual(stock_quant_obj.search(domain_to).quantity, qty_done)

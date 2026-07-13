@@ -12,4 +12,6 @@ class StockPicking(models.Model):
     )
     maintenance_equipment_id = fields.Many2one(
         related="maintenance_request_id.equipment_id",
+        store=True,
+        index=True,
     )

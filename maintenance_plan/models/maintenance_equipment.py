@@ -2,8 +2,12 @@
 # Copyright 2019-20 ForgeFlow S.L. (https://www.forgeflow.com)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
+
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+
+_logger = logging.getLogger(__name__)
 
 
 class MaintenanceEquipment(models.Model):
@@ -130,6 +134,7 @@ class MaintenanceEquipment(models.Model):
         furthest_maintenance_request = self.env["maintenance.request"].search(
             [
                 ("maintenance_plan_id", "=", mtn_plan.id),
+                ("equipment_id", "=", self.id),
                 ("request_date", ">=", start_maintenance_date_plan),
             ],
             order="request_date desc",
@@ -163,7 +168,13 @@ class MaintenanceEquipment(models.Model):
                 next_maintenance_date = next_maintenance_date + mtn_plan.get_relativedelta(
                     mtn_plan.interval, mtn_plan.interval_step or "year"
                 )
-        if not requests.search([("maintenance_plan_id", "=", mtn_plan.id), ('stage_id.done', '=', False)]):
+        if not requests.search(
+            [
+                ("maintenance_plan_id", "=", mtn_plan.id),
+                ("equipment_id", "=", self.id),
+                ("stage_id.done", "=", False),
+            ]
+        ):
             vals = self._prepare_request_from_plan(mtn_plan, next_maintenance_date)
             requests |= self.env["maintenance.request"].create(vals)
         return requests
@@ -174,14 +185,22 @@ class MaintenanceEquipment(models.Model):
         Generates maintenance request on the next_maintenance_date or
         today if none exists
         """
-        for plan in (
+        plans = (
             self.env["maintenance.plan"]
             .sudo()
             .search([("interval", ">", 0)])
             .filtered(lambda x: True if not x.equipment_id else x.equipment_id.active)
-        ):
-            equipment = plan.equipment_id
-            equipment._create_new_request(plan)
+        )
+        for plan in plans:
+            # Isolate each plan in a savepoint so one failure (e.g. a malformed
+            # generate_domain) does not abort generation for every other plan.
+            try:
+                with self.env.cr.savepoint():
+                    plan._generate_requests()
+            except Exception:
+                _logger.exception(
+                    "Maintenance plan %s: request generation failed", plan.id
+                )
 
     @api.depends(
         "maintenance_plan_ids.next_maintenance_date", "maintenance_ids.request_date"

@@ -82,17 +82,19 @@ class AccountMoveLine(models.Model):
                 item.product_id.maintenance_ok
                 and item.product_id.product_tmpl_id.categ_id.equipment_category_ids
             ):
-                item.equipment_category_id = fields.first(
-                    item.product_id.product_tmpl_id.categ_id.equipment_category_ids
+                item.equipment_category_id = (
+                    item.product_id.product_tmpl_id.categ_id.equipment_category_ids[:1]
                 )
             else:
                 item.equipment_category_id = item.equipment_category_id
 
     def _compute_equipment_count(self):
-        data = self.env["maintenance.equipment"].read_group(
-            [("move_line_id", "in", self.ids)], ["move_line_id"], ["move_line_id"]
+        # _read_group (v17+) returns (groupby_value, *aggregates) tuples; the
+        # deprecated read_group is being removed.
+        data = self.env["maintenance.equipment"]._read_group(
+            [("move_line_id", "in", self.ids)], ["move_line_id"], ["__count"]
         )
-        mapping = {x["move_line_id"][0]: x["move_line_id_count"] for x in data}
+        mapping = {move_line.id: count for move_line, count in data}
         for item in self:
             item.equipment_count = mapping.get(item.id, 0)
 
@@ -103,9 +105,9 @@ class AccountMoveLine(models.Model):
     def _set_equipment_category(self):
         if not self.equipment_category_id:
             category_model = self.env["maintenance.equipment.category"].sudo()
-            category = fields.first(
-                self.product_id.product_tmpl_id.categ_id.equipment_category_ids
-            )
+            category = self.product_id.product_tmpl_id.categ_id.equipment_category_ids[
+                :1
+            ]
             if not category:
                 category = category_model.create(
                     self._prepare_equipment_category_vals()
